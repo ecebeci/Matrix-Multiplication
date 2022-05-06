@@ -91,7 +91,7 @@ int main(int argc, char* argv[])
 
 	printf("\n Press any button to exit...");
 
-	_getch();
+	(void)_getch();
 	return 0;
 }
 
