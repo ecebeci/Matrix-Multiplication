@@ -1,3 +1,6 @@
+; Square Two Same Size Matrix Multiplication using SSE2 instructions
+; Note: Matrix size must be 4 and its multiples. Two of matrices have to same size.
+; Written by M. Emre Cebeci - May 2022
 .MODEL FLAT, C 
 .CODE 
 
@@ -92,7 +95,7 @@ r1:
 				add eax, [esp+4] 
 				movdqu xmm0, [eax] 
 
-				;; r2 column ve r3 adresi iterations
+				;; r2 column ve r3 address iterations
 				mov eax, [esp] 
 				shl eax, 2 
 				mov edx, [ebp+16] 
