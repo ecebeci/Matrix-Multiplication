@@ -1,10 +1,11 @@
-#include <conio.h>
 #include <stdio.h>
 #include <intrin.h>
+#include <stdlib.h> // rand()
+#include <time.h>  // for srand()
 
-// NOTE: You need to change value if you change matrix size
-// Square (N x N) Matrix size
-#define N 12
+// NOTE: This function just use 4 and multiples of size matrices like 4-8-12-16-...
+// Square (N x N) 
+#define N 4
 
 extern "C" {
 	int matrix_multiple(int[], int[], int, int, int[]);
@@ -15,35 +16,32 @@ bool resultChecker(int[][N], int[][N]);
 
 int main(int argc, char* argv[])
 {
-	unsigned __int64 initial_counter, final_counter;
-
-	// 4x4
-	//int matrix1[N][N] = { {2,3,45,3}, {4,3,1,9}, {1,2,3,1} , {1,2,3,4} };
-	//int matrix2[N][N] = { {1,3,1, 3}, {4,3,1,9}, {1,2,3,1} , {1,2,3,4} };
-
-	// 8x8
-	//int matrix1[N][N] = { {5,2,1,8,6,7,1,3}, {13,1,5,19,5,2,1,4}, {5,16,7,8,5,2,1,4}, {13,11,5,19,13,11,5,19} , {5,2,1,4,13,11,5,19}, {13,1,5,19,13,11,5,19}, {5,16,7,8,13,11,5,19}, {13,11,5,19,13,11,5,19}  };
-	//int matrix2[N][N] = { {1,2,3,4,9,2,3,4} , {13,11,5,19,5,2,1,4 }, { 5,4,7,8,5,2,1,4 }, { 13,1,5,19,13,11,5,19 } , {3,2,1,4,13,11,5,19}, {13,1,5,19,13,11,5,19}, {1,16,7,8,13,11,5,19}, {2,11,5,19,13,11,5,19} };
-
-	// 12x12
-	int matrix1[N][N] = { 5 ,44 ,6 ,23 ,30 ,26 ,16 ,10 ,32 ,32 ,1 ,48,24 ,30 ,3 ,31 ,1 ,32 ,40 ,5 ,2 ,16 ,49 ,15,36 ,26 ,14 ,11 ,28 ,20 ,12 ,16 ,8 ,42 ,12 ,34,23 ,15 ,46 ,26 ,38 ,29 ,50 ,9 ,49 ,8 ,30 ,14,36 ,2 ,24 ,20 ,23 ,40 ,35 ,37 ,46 ,20 ,47 ,50,17 ,17 ,46 ,19 ,48 ,31 ,12 ,5 ,3 ,19 ,24 ,26,29 ,5 ,27 ,41 ,12 ,8 ,18 ,44 ,46 ,27 ,32 ,37,10 ,24 ,4 ,34 ,50 ,4 ,42 ,29 ,1 ,28 ,41 ,40,37 ,43 ,1 ,42 ,2 ,8 ,8 ,19 ,23 ,4 ,9 ,39,8 ,44 ,22 ,50 ,2 ,42 ,12 ,35 ,45 ,44 ,30 ,1,35 ,3 ,29 ,15 ,28 ,36 ,27 ,8 ,44 ,38 ,34 ,11,18 ,8 ,8 ,33 ,27 ,38 ,33 ,29 ,18 ,8 ,46 ,28 };
-	int matrix2[N][N] = { 6 ,7 ,23 ,15 ,4 ,17 ,24 ,34 ,48 ,39 ,47 ,39,50 ,15 ,13 ,18 ,16 ,3 ,8 ,50 ,19 ,25 ,40 ,16,39 ,19 ,13 ,19 ,40 ,43 ,18 ,31 ,37 ,48 ,46 ,26,48 ,28 ,1 ,22 ,41 ,4 ,22 ,37 ,29 ,5 ,29 ,25,12 ,19 ,43 ,44 ,39 ,19 ,31 ,23 ,43 ,1 ,47 ,46,13 ,45 ,47 ,25 ,30 ,13 ,38 ,12 ,21 ,32 ,32 ,19,28 ,35 ,39 ,37 ,29 ,46 ,45 ,39 ,20 ,38 ,32 ,32,3 ,18 ,33 ,20 ,5 ,21 ,48 ,22 ,16 ,4 ,33 ,8,2 ,19 ,46 ,19 ,11 ,16 ,33 ,21 ,23 ,44 ,32 ,38,30 ,12 ,35 ,37 ,38 ,17 ,48 ,27 ,18 ,21 ,40 ,3,41 ,6 ,11 ,13 ,48 ,3 ,6 ,32 ,29 ,39 ,32 ,31,7 ,11 ,18 ,41 ,7 ,46 ,32 ,22 ,37 ,26 ,10 ,29 };
-
-	// 16x16
-	//int matrix1[N][N] = { 15 ,40 ,8 ,1 ,33 ,43 ,38 ,36 ,25 ,20 ,18 ,13 ,5 ,48 ,3 ,5,30 ,50 ,10 ,18 ,40 ,10 ,28 ,22 ,7 ,40 ,43 ,19 ,41 ,41 ,35 ,49,39 ,45 ,46 ,49 ,20 ,15 ,31 ,11 ,39 ,42 ,22 ,49 ,2 ,1 ,43 ,40,16 ,19 ,49 ,20 ,26 ,18 ,18 ,41 ,9 ,36 ,46 ,47 ,19 ,2 ,41 ,11,33 ,11 ,30 ,5 ,38 ,1 ,31 ,29 ,5 ,43 ,15 ,27 ,36 ,32 ,10 ,38,21 ,31 ,26 ,40 ,23 ,15 ,42 ,10 ,21 ,15 ,25 ,38 ,24 ,19 ,36 ,40,18 ,8 ,1 ,2 ,7 ,41 ,6 ,15 ,50 ,24 ,1 ,2 ,38 ,16 ,11 ,12,24 ,19 ,12 ,2 ,24 ,16 ,21 ,13 ,35 ,11 ,17 ,49 ,6 ,42 ,4 ,20,24 ,13 ,38 ,50 ,25 ,47 ,22 ,43 ,50 ,23 ,23 ,5 ,5 ,14 ,32 ,22,25 ,48 ,29 ,19 ,35 ,23 ,6 ,20 ,42 ,27 ,20 ,49 ,14 ,32 ,8 ,31,50 ,16 ,34 ,27 ,2 ,36 ,5 ,30 ,1 ,45 ,18 ,37 ,5 ,9 ,47 ,50,15 ,1 ,26 ,18 ,12 ,9 ,31 ,8 ,9 ,43 ,10 ,20 ,30 ,24 ,33 ,24,12 ,21 ,43 ,28 ,3 ,7 ,41 ,6 ,42 ,28 ,22 ,37 ,24 ,43 ,31 ,20,3 ,42 ,22 ,8 ,28 ,46 ,29 ,5 ,25 ,30 ,30 ,38 ,23 ,14 ,48 ,40,23 ,42 ,18 ,20 ,35 ,18 ,48 ,47 ,48 ,17 ,32 ,9 ,9 ,19 ,9 ,2,3 ,23 ,29 ,15 ,7 ,25 ,27 ,47 ,28 ,24 ,9 ,49 ,49 ,26 ,6 ,17 };
-	//int matrix2[N][N] = { 5 ,13 ,21 ,5 ,32 ,24 ,4 ,43 ,28 ,40 ,4 ,46 ,22 ,25 ,47 ,50,24 ,35 ,48 ,18 ,34 ,40 ,2 ,12 ,49 ,11 ,7 ,44 ,47 ,23 ,39 ,24,32 ,11 ,32 ,23 ,46 ,46 ,43 ,15 ,42 ,36 ,5 ,3 ,38 ,12 ,5 ,26,7 ,16 ,36 ,44 ,17 ,7 ,24 ,49 ,28 ,21 ,21 ,30 ,28 ,36 ,28 ,49,6 ,4 ,44 ,14 ,47 ,12 ,12 ,47 ,12 ,22 ,20 ,50 ,43 ,30 ,23 ,35,43 ,43 ,4 ,40 ,10 ,42 ,6 ,45 ,25 ,36 ,6 ,14 ,32 ,47 ,6 ,29,30 ,7 ,18 ,47 ,15 ,20 ,14 ,22 ,48 ,35 ,22 ,35 ,10 ,34 ,45 ,37,2 ,35 ,36 ,41 ,37 ,28 ,6 ,5 ,19 ,16 ,38 ,16 ,11 ,35 ,24 ,21,32 ,50 ,26 ,20 ,35 ,27 ,15 ,49 ,49 ,3 ,32 ,5 ,39 ,47 ,32 ,47,27 ,34 ,38 ,12 ,49 ,12 ,32 ,33 ,44 ,3 ,49 ,36 ,5 ,30 ,1 ,30,27 ,31 ,36 ,38 ,14 ,25 ,12 ,13 ,2 ,45 ,27 ,3 ,6 ,19 ,46 ,41,28 ,3 ,11 ,33 ,3 ,23 ,18 ,34 ,28 ,32 ,28 ,4 ,49 ,40 ,44 ,15,18 ,30 ,43 ,3 ,32 ,1 ,2 ,44 ,10 ,48 ,45 ,25 ,3 ,36 ,23 ,13,49 ,25 ,16 ,21 ,31 ,29 ,33 ,3 ,8 ,27 ,39 ,19 ,10 ,31 ,42 ,27,42 ,47 ,20 ,35 ,44 ,27 ,11 ,2 ,5 ,38 ,20 ,16 ,15 ,8 ,27 ,33,14 ,29 ,4 ,5 ,31 ,1 ,32 ,17 ,41 ,50 ,18 ,7 ,37 ,50 ,12 ,18 };
+	int matrix1[N][N];
+	int matrix2[N][N];
 
 	int matrix2Transposed[N][N];
 
 	int matrixResult[N][N] = { 0 };
 
-	initial_counter = __rdtsc(); 
-	_asm { 
+	unsigned __int64 initial_counter, final_counter;
+
+	srand(time(0));
+
+	// Generate random values for matrices
+	for (int i = 0; i < N; i++) {
+		for (int j = 0; j < N; j++) {
+			matrix1[i][j] = rand(); // % 100
+			matrix2[i][j] = rand() / 100;
+		}
+	}
+
+	initial_counter = __rdtsc();
+	_asm {
 		lea eax, matrix2Transposed
 		push eax
 		lea eax, matrixResult
 		push eax
-		push N  ; indicates Matrix size
+		push N; indicates Matrix size
 		lea eax, matrix2
 		push eax
 		lea eax, matrix1
@@ -52,8 +50,7 @@ int main(int argc, char* argv[])
 		add esp, 20
 	}
 	final_counter = __rdtsc();
-
-	printf("Assembly Code executed in %I64d CPU cycles \n", final_counter - initial_counter);
+	printf("Assembly with SSE instructions is executed in %I64d CPU cycles. ", final_counter - initial_counter);
 	printf("Assembly code result is: \n");
 	for (int i = 0; i < N; i++) {
 		for (int j = 0; j < N; j++) {
@@ -62,28 +59,29 @@ int main(int argc, char* argv[])
 		printf("\n");
 	}
 
-	initial_counter = __rdtsc();
+	printf("\n");
+
+
 	int matrixResult2[N][N] = { 0 };
+
+	initial_counter = __rdtsc();
 	mulMat(matrix1, matrix2, matrixResult2); // Calls C++ code function
 	final_counter = __rdtsc();
-
-	printf("\nC++ Code executed in %I64d CPU cycles \n", final_counter - initial_counter);
-	printf("C++ code result is: \n");
+	printf("C/C++ code is executed in %I64d CPU cycles \n", final_counter - initial_counter);
+	printf("C/C++ code result is: \n");
 	for (int i = 0; i < N; i++) {
 		for (int j = 0; j < N; j++) {
-			printf("%d\t", matrixResult2[i][j]);
+			printf("%d \t", matrixResult2[i][j]);
 		}
 		printf("\n");
 	}
-
 	if (resultChecker(matrixResult, matrixResult2))
 		printf("\nSUCCESS! Two of results are same.\n");
 	else
-		printf("\nFAILURE! Difference is found\n");
+		printf("\nFAILURE! Difference is found!\n");
 
-	printf("\n Press any button to exit...");
-
-	(void)_getch();
+	printf("\nPress any button to exit...");
+	(void)getchar();
 	return 0;
 }
 
